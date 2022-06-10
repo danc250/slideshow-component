@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Slideshow example</title>
+	<style type="text/css">
+
+
+		html, body {
+			padding: 0;
+			margin: 0;
+		}
+
+
+
+		/*/ Dev /*/
+
+		.slideshow {
+			border: red 3px solid;
+		}
+
+		.slideshow div {
+			border: black 3px dotted;
+		}
+
+		.left-arrow {
+			border: blue 2px solid;
+		}
+		.right-arrow {
+			border: green 2px solid;
+		}
+		.
+
+		/*/ End Dev /*/
+
+		.slideshow {
+			align-items: stretch;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.display {
+			position: relative;
+			overflow: hidden;
+		}
+
+		.display .arrow {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			height: 64px;
+			width: 64px;
+			z-index: 9001;
+		}
+
+		.display .left-arrow {
+			left: 32px;
+		}
+
+		.display .right-arrow {
+			right: 32px;
+		}
+
+		.slides {
+			display: flex;
+			/*width: 300%; / Need to change in the future! /*/
+			position: relative;
+			/*left: -200%; / Need to change in the future! /*/
+		}
+
+		.slide {
+			align-items: center;
+			display: flex;
+			flex-direction: column;
+			height: 600px;
+			justify-content: space-between;
+			overflow: hidden;
+			box-sizing: border-box;
+			position: relative;
+			/*width: 50%; / Need to change in the future! /*/
+		}
+
+		.image {
+			position: absolute;
+			height: 100%;
+			width: 100%;
+		}
+
+		.bubbles {
+			align-items: center;
+			display: flex;
+			justify-content: center;
+		}
+
+		.indicator {
+			display: flex;
+		}
+
+	</style>
+</head>
+<body>
+	<div class="slideshow" id="some-unique-id">
+		<div class="display">
+			<div class="left-arrow arrow">
+				left arrow
+			</div>
+			<div class="right-arrow arrow">
+				right arrow
+			</div>
+			<div class="slides">
+
+
+				<!-- 
+				<div class="slide">
+					<div class="image">
+						image
+					</div>
+					<div class="title">
+						title
+					</div>
+					<div class="excerpt">
+						excerpt
+					</div>
+				</div>
+
+
+				<div class="slide">
+					<div class="image">
+						image
+					</div>
+					<div class="title">
+						title
+					</div>
+					<div class="excerpt">
+						excerpt
+					</div>
+				</div>
+				 -->
+
+
+			</div>
+		</div>
+		<div class="bubbles">
+			<div class="indicator">
+				<div class="left-arrow">
+					Left Arrow (<)
+				</div>
+				<div>
+					Bubble (*)
+				</div>
+				<div class="right-arrow">
+					Right Arrow (>)
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+
+		// By convention, we are prefixing and variables that hold an element with $
+
+		const slideshows = [...document.getElementsByClassName('slideshow')]
+		console.log(slideshows)
+
+		let currentSlide = 0
+
+		function onClickPrevious ($slides) {
+			++ currentSlide
+			$slides.style.left = (currentSlide) * 100 * -1 + '%'
+			console.log('left hanlder')
+		}
+
+		function onClickNext ($slides) {
+			-- currentSlide
+			$slides.style.left = (currentSlide) * 100 * -1 + '%'
+			console.log('right hanlder')
+		}
+
+		const allSlides = {
+		/*/ Need to add additional example slides in the future! /*/
+
+			'some-unique-id': [
+				{
+					title: 'Some Example Title',
+					excerpt: 'Some Example Excerpt'
+				},
+				{
+					title: 'Boomer is the best because he is patient with White Dan',
+					excerpt: 'Psych, he still sucks'
+				},
+				{
+					title: 'Boomer dope',
+					excerpt: 'ayyy'
+				}
+			]
+		}
+
+		function createDivWithClass(className) {
+			const $div = document.createElement('div')
+			$div.classList.add(className)
+			return $div
+		}
+
+		function createDivWithClassAndSetInnerHTML(className, innerHTML) {
+			$div = createDivWithClass(className)
+			$div.innerHTML = innerHTML
+			return $div
+		}
+
+		function createSlide($slides, slide) {
+			$slide = createDivWithClass('slide')
+
+			$title = createDivWithClassAndSetInnerHTML('title', slide.title)
+			$excerpt = createDivWithClassAndSetInnerHTML('excerpt', slide.excerpt)
+
+			$image = createDivWithClass('image')
+
+			$slide.append($title, $excerpt, $image)
+
+			return $slide
+		}
+
+		function play ($slides) {
+			setTimeout(() => {
+				onClickPrevious($slides)
+				play($slides)
+			}, 10000)
+		}
+
+		slideshows.forEach(slideshow => {
+			const slides = allSlides[slideshow.id]
+
+			// get slides element
+			const $slides = slideshow.querySelector('.slides')
+			$slides.style.width = slides.length * 100 + '%'
+
+			// create slides
+			$newSlides = slides.map(slide => createSlide($slides, slide))
+
+			$newSlides.forEach($slide => {
+				$slide.style.width = 1 / $newSlides.length * 100 + '%'
+				$slides.append($slide)
+			})
+
+			// $slides.append($slide)
+			// attach "previous" handlers
+			slideshow.querySelectorAll('.left-arrow').forEach($arrow => $arrow.addEventListener('click', () => onClickPrevious($slides)))
+
+			// attach "next" handlers
+			slideshow.querySelectorAll('.right-arrow').forEach($arrow => $arrow.addEventListener('click', () => onClickNext($slides)))
+
+
+			play($slides)
+		})
+
+
+
+	</script>
+</body>
+</html>
